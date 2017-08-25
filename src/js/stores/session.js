@@ -21,7 +21,7 @@ class Session {
     }
 
     @action async getCode() {
-        var response = await axios.get('https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=en_US&_=1499075647264');
+        var response = await axios.get('https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=en_US&_=' + +new Date());
         var code = response.data.match(/[A-Za-z_\-\d]{10}==/)[0];
 
         self.code = code;
@@ -118,7 +118,6 @@ class Session {
         self.user.ContactList.map(e => {
             e.HeadImgUrl = `${axios.defaults.baseURL}${e.HeadImgUrl.substr(1)}`;
         });
-        self.user.User.HeadImgUrl = `${axios.defaults.baseURL}${self.user.User.HeadImgUrl.substr(1)}`;
         await contacts.getContats();
         await chat.loadChats(self.user.ChatSet);
 
@@ -152,11 +151,23 @@ class Session {
         }
 
         response.data.AddMsgList.map(e => {
-            if (e.FromUserName === self.user.User.UserName) {
-                return chat.markedRead(e.ToUserName);
+            var from = e.FromUserName;
+            var to = e.ToUserName;
+
+            // When message has been readed on your phone, will receive this message
+            if (e.MsgType === 51) {
+                return chat.markedRead(to);
             }
 
-            if (e.FromUserName.startsWith('@')) {
+            // Sync message from your phone
+            if (from === self.user.User.UserName
+                && from !== to) {
+                // Message is sync from your phone
+                chat.addMessage(e, true);
+                return;
+            }
+
+            if (from.startsWith('@')) {
                 chat.addMessage(e);
             }
         });
