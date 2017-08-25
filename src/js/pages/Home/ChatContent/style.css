@@ -155,7 +155,7 @@
         margin-bottom: 6px;
         display: inline-block;
         font-family: 'Georgia' !important;
-        font-size: 12px !important;
+        font-size: 9px !important;
         color: #f65431 !important;
     }
 }
@@ -700,13 +700,13 @@
     .message.isText {
         & p {
             min-width: 37px;
-            padding: 8.32px 11.3px 6px 26px;
+            padding: 8.32px 11.3px 0 26px;
             font-size: 13px;
             line-height: 16px;
         }
 
         & .times {
-            margin-left: 26px;
+            margin-left: 10px;
             margin-bottom: 4px;
         }
     }
